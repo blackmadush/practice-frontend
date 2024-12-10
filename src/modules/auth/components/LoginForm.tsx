@@ -10,6 +10,9 @@ import { loginUser } from "../../../services/api";
 import { authDataService } from "../../../services/data/authDataService";
 import CdCard from "../../../shared-components/atoms/Card/CdCard";
 import CdCardBody from "../../../shared-components/atoms/Card/CardBody";
+import "../../../assets/scss/Login.scss";
+import Logo from "../../../shared-components/atoms/Logo/CdLogo";
+import LogoImage from "../../../assets/images/login.png";
 
 const LoginForm: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -53,6 +56,7 @@ const LoginForm: React.FC = () => {
       authDataService.jwtToken = token;
 
       if (authDataService.jwtToken?.length > 0) {
+        //jwtdecode library
         navigate("/dashboard");
       } else {
         setErrors({
@@ -67,46 +71,42 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <CdCard className="card mx-auto">
+    <div className="login-container">
+      <CdCard className="card">
+        <div className="login-logo">
+          <Logo src={LogoImage}></Logo>
+        </div>
         <CdCardBody>
-          <div className="login-form-container">
-            <LoginFormOrganism onSubmit={handleSubmit}>
-              <FormGroup label="Email" error={errors.email}>
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  required
-                />
-              </FormGroup>
-              <FormGroup label="Password" error={errors.password}>
-                <Input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  required
-                />
-              </FormGroup>
-              {errors.form && (
-                <div className="text-danger mb-3">{errors.form}</div>
-              )}
-              <Button
-                color="primary"
-                type="submit"
-                disabled={authState.loading}
-                style={{ width: 100 }}
-                block
-                outline
-                size="lg"
-                className="mt-5"
-              >
-                {authState.loading ? "Logging in..." : "Login"}
-              </Button>
-            </LoginFormOrganism>
-          </div>
+          <h3>Login to Your Account</h3>
+          <LoginFormOrganism onSubmit={handleSubmit}>
+            <FormGroup label="Email" error={errors.email}>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+              />
+            </FormGroup>
+            <FormGroup label="Password" error={errors.password}>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+              />
+            </FormGroup>
+            {errors.form && <div className="error-message">{errors.form}</div>}
+            <Button
+              color="primary"
+              type="submit"
+              disabled={authState.loading}
+              className="login-button"
+            >
+              {authState.loading ? "Logging in..." : "Login"}
+            </Button>
+          </LoginFormOrganism>
         </CdCardBody>
       </CdCard>
     </div>

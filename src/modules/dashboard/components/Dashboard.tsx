@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
-import Button from "../../../shared-components/atoms/Button";
 import { useNavigate } from "react-router-dom";
-import DataTable from "../../../shared-components/organisms/Table/DataTable";
-import { fetchDataItems } from "../../../services/api";
-import { authDataService } from "../../../services/data/authDataService";
+import Button from "../../../shared-components/atoms/Button";
 import CdInputField from "../../../shared-components/atoms/Input/CdInputField";
 import CdDropDown from "../../../shared-components/atoms/DropDown/CdDropDown";
+import { fetchDataItems } from "../../../services/api";
+import { authDataService } from "../../../services/data/authDataService";
+import CdCard from "../../../shared-components/atoms/Card/CdCard";
+import ChartAtom from "../../../shared-components/atoms/Chart/ChartAtom";
+import "../../../assets/scss/Dashboard.scss";
+import CdButton from "../../../shared-components/atoms/Button/CdButton";
 
 interface DataItem {
   id: number;
@@ -16,16 +19,10 @@ interface DataItem {
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-
   const [dataItems, setDataItems] = useState<DataItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("All");
-
-  const handleLogout = () => {
-    authDataService.jwtToken = "";
-    navigate("/login");
-  };
 
   useEffect(() => {
     const token = authDataService.jwtToken;
@@ -42,6 +39,7 @@ const Dashboard: React.FC = () => {
         console.error("Failed to fetch data items:", error);
         if (error.response && error.response.status === 401) {
           authDataService.jwtToken = "";
+          localStorage.clear();
           navigate("/login");
         }
       } finally {
@@ -61,31 +59,65 @@ const Dashboard: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const headers = ["ID", "Name", "Value", "Status"];
+  const totalItems = filteredData.length;
+  const totalActive = filteredData.filter(
+    (item) => item.status === "Active"
+  ).length;
+  const totalCompleted = filteredData.filter(
+    (item) => item.status === "Completed"
+  ).length;
 
-  const data = filteredData.map((item) => [
-    item.id,
-    item.name,
-    item.value,
-    item.status,
-  ]);
+  const chartData = {
+    labels: filteredData.map((item) => item.name),
+    datasets: [
+      {
+        label: "Values",
+        data: filteredData.map((item) => item.value),
+        backgroundColor: "rgba(75, 192, 192, 0.2)",
+        borderColor: "rgba(75, 192, 192, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { position: "top" as const },
+      title: { display: true, text: "Data Chart" },
+    },
+  };
 
   return (
     <div className="dashboard-container">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Welcome to the Dashboard!</h2>
-        <Button color="secondary" onClick={handleLogout}>
+      <div className="header">
+        <h1>Welcome to the Dashboard!</h1>
+        <Button color="secondary" onClick={() => navigate("/login")}>
           Logout
         </Button>
       </div>
 
-      <div className="d-flex gap-3 mb-3">
+      <div className="cards-container">
+        <CdCard className="card">
+          <h3>Total Items</h3>
+          <p>{totalItems}</p>
+        </CdCard>
+        <CdCard className="card">
+          <h3>Active Items</h3>
+          <p>{totalActive}</p>
+        </CdCard>
+        <CdCard className="card">
+          <h3>Completed Items</h3>
+          <p>{totalCompleted}</p>
+        </CdCard>
+      </div>
+
+      <div className="filters">
         <CdInputField
           placeholder="Search by name"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-
         <CdDropDown
           options={["All", "Active", "Completed", "Pending"]}
           value={statusFilter}
@@ -93,18 +125,15 @@ const Dashboard: React.FC = () => {
         />
       </div>
 
-      {loading ? (
-        <p>Loading data...</p>
-      ) : (
-        <DataTable
-          headers={headers}
-          data={data}
-          striped
-          hover
-          bordered
-          responsive
-        />
-      )}
+      <div className="chart-container">
+        <ChartAtom data={chartData} options={chartOptions} />
+      </div>
+
+      <div className="action">
+        <Button color="primary" onClick={() => navigate("/table")}>
+          View Full Table
+        </Button>
+      </div>
     </div>
   );
 };

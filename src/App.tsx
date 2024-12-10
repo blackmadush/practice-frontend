@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import LoginForm from "./modules/auth/components/LoginForm";
 import Dashboard from "./modules/dashboard/components/Dashboard";
+import TablePage from "./modules/table/Table";
 import { authDataService } from "./services/data/authDataService";
 
 const App: React.FC = () => {
@@ -26,7 +27,7 @@ const App: React.FC = () => {
     };
   }, []);
 
-  const ProtectedRoute = () => {
+  const ProtectedRoute: React.FC = () => {
     const isAuthenticated = Boolean(authDataService.jwtToken?.length > 0);
     return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
   };
@@ -40,9 +41,13 @@ const App: React.FC = () => {
             !isAuthenticated ? <LoginForm /> : <Navigate to="/dashboard" />
           }
         />
+
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
+
+          <Route path="/table" element={<TablePage />} />
         </Route>
+
         <Route
           path="*"
           element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />}

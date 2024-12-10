@@ -1,0 +1,49 @@
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f8f9fa;
+  font-family: Arial, sans-serif;
+
+  .card {
+    width: 400px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+
+    .login-logo {
+      background-color: #ffffff;
+      color: white;
+      padding: 10px;
+      text-align: center;
+
+      img {
+        width: 150px;
+        height: auto;
+      }
+    }
+
+    h3 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #343a40;
+    }
+  }
+
+  .error-message {
+    color: red;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  .login-button {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+  }
+}
